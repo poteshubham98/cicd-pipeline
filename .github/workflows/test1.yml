@@ -1,0 +1,41 @@
+name: Deploy Storage Account with Bicep (Windows Self-hosted)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Azure Login with Managed Identity
+        uses: azure/login@v2
+        with:
+          auth-type: IDENTITY
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install Bicep CLI (if not already)
+        run: az bicep install
+        shell: pwsh
+
+      - name: Deploy Bicep Template
+        run: |
+          Write-Host "🔁 Running Bicep deployment..."
+          $result = az deployment group create `
+            --resource-group github-cicd `
+            --template-file infra/storageaccount.bicep `
+            --parameters storageAccountName=storagedemo15mpsw3 location=eastus `
+            --output json
+
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "❌ Deployment failed."
+            exit 1
+          } else {
+            Write-Host "✅ Deployment succeeded!"
+            Write-Host $result
+          }
+        shell: pwsh
