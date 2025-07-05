@@ -1,0 +1,31 @@
+name: Deploy Raw Storage Account
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-raw:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure login using managed identity
+        uses: azure/login@v2
+        with:
+          auth-type: IDENTITY
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy raw storage account using Bicep
+        uses: azure/bicep-deploy@v2
+        with:
+          name: RawStorageDeployment
+          type: deployment
+          operation: create
+          scope: resourceGroup
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: github-cicd
+          template-file: infra/main_dev.bicep
+          parameters-file: infra/main_dev.bicepparam
