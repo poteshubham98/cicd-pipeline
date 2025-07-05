@@ -1,6 +1,6 @@
 using 'main_dev.bicep'
 
-param prefix = 'avt'
+param prefix = 'a'
 param stamp = '1'
-param envType = 'dev'
+param envType = 'd'
 param region = 'japaneast'
