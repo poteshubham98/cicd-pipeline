@@ -3,7 +3,7 @@ param stamp string
 param envType string
 param region string
 
-// VNet
+// Create Virtual Network
 resource vnet 'Microsoft.Network/virtualNetworks@2022-07-01' = {
   name: '${prefix}-shared-ntwk-${envType}-${stamp}'
   location: region
@@ -30,7 +30,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-07-01' = {
   }
 }
 
-// Storage Account
+// Create Derived Storage Account
 resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
   name: '${prefix}dataopssaderiv${envType}${stamp}'
   location: region
@@ -57,12 +57,10 @@ resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
         {
           id: '${vnet.id}/subnets/AzureBastionSubnet'
           action: 'Allow'
-          state: 'Succeeded'
         }
         {
           id: '${vnet.id}/subnets/default'
           action: 'Allow'
-          state: 'Succeeded'
         }
       ]
       ipRules: []
@@ -91,7 +89,7 @@ resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
   ]
 }
 
-// Blob Service
+// Create Blob Services
 resource derived_blobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' = {
   parent: derived
   name: 'default'
@@ -111,7 +109,7 @@ resource derived_blobServices 'Microsoft.Storage/storageAccounts/blobServices@20
   }
 }
 
-// Blob Containers
+// Containers
 resource curated_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
   parent: derived_blobServices
   name: 'curated'
@@ -134,7 +132,7 @@ resource extracted_container 'Microsoft.Storage/storageAccounts/blobServices/con
 
 resource synchronized_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
   parent: derived_blobServices
-  name: 'synchronized'
+  name: 'synchronizeed'
   properties: {
     defaultEncryptionScope: '$account-encryption-key'
     denyEncryptionScopeOverride: false
@@ -142,5 +140,5 @@ resource synchronized_container 'Microsoft.Storage/storageAccounts/blobServices/
   }
 }
 
-// Output storage key
+// Output storage account key
 output derivedaccountKey string = listKeys(derived.id, '2023-04-01').keys[0].value
