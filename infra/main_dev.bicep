@@ -11,6 +11,7 @@ param stamp string
 param envType string
 param region string
 
+// Raw Storage Account
 module raw 'StorageAccount/raw/template.bicep' = {
   name: 'Raw_StorageModule'
   params: {
@@ -20,6 +21,18 @@ module raw 'StorageAccount/raw/template.bicep' = {
     region: region
   }
 }
+
+// Derived Storage Account
+module derived 'StorageAccount/derived/template.bicep' = {
+  name: 'Derived_StorageModule'
+  params: {
+    prefix: prefix
+    stamp: stamp
+    envType: envType
+    region: region
+  }
+}
+
 
 // // Landing Storage Account
 // module landing 'StorageAccount/landing/template.bicep' = {
@@ -43,16 +56,7 @@ module raw 'StorageAccount/raw/template.bicep' = {
 //   }
 // }
 
-// // Derived Storage Account
-// module derived 'StorageAccount/derived/template.bicep' = {
-//   name: 'Derived_StorageModule'
-//   params: {
-//     prefix: prefix
-//     stamp: stamp
-//     envType: envType
-//     region: region
-//   }
-// }
+
 
 // // Enriched Storage Account
 // module enriched 'StorageAccount/enriched/template.bicep' = {
