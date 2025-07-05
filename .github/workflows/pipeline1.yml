@@ -1,0 +1,46 @@
+name: Deploy Infra with Bicep
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'Environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+          - test
+
+env:
+  # Map parameterized env input to short envType
+  ENV_TYPE: ${{ github.event.inputs.env == 'prod' && 'prd' || github.event.inputs.env == 'test' && 'tst' || 'dev' }}
+
+jobs:
+  deploy:
+    name: Deploy Infra with Bicep
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Bicep
+        uses: azure/arm-deploy@v1
+        with:
+          scope: resourcegroup
+          resourceGroupName: '${{ secrets.RESOURCE_GROUP_BASE }}-${{ env.ENV_TYPE }}-${{ secrets.STAMP }}'
+          template: infra/main_v2.bicep
+          parameters: >
+            infra/main_${{ env.ENV_TYPE }}.bicepparam
+            -prefix ${{ secrets.PREFIX }}
+            -stamp ${{ secrets.STAMP }}
+            -envType ${{ env.ENV_TYPE }}

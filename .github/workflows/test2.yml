@@ -1,0 +1,29 @@
+name: Deploy Storage Account with Bicep (Windows Self-hosted)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Azure Login with Managed Identity
+        uses: azure/login@v2
+        with:
+          auth-type: IDENTITY
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Bicep Template
+        uses: Azure/bicep-deploy@v1
+        with:
+          scope: resourcegroup
+          resourceGroupName: github-cicd
+          templateFile: infra/storageaccount.bicep
+          parameters: >
+            storageAccountName=storagedemo15mpsw3
+            location=eastus
