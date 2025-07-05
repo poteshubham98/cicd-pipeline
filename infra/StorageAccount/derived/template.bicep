@@ -100,7 +100,7 @@ resource extracted_container 'Microsoft.Storage/storageAccounts/blobServices/con
 
 resource synchronized_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
   parent: derived_blobServices
-  name: 'synchronized'
+  name: 'synchronizeed'
   properties: {
     defaultEncryptionScope: '$account-encryption-key'
     denyEncryptionScopeOverride: false
