@@ -22,8 +22,8 @@ jobs:
         uses: Azure/bicep-deploy@v1
         with:
           scope: resourcegroup
-          resourceGroupName: github-cicd
-          templateFile: infra/storageaccount.bicep
+          resource-group-name: github-cicd
+          template-file: infra/storageaccount.bicep
           parameters: >
             storageAccountName=storagedemo15mpsw3
             location=eastus
