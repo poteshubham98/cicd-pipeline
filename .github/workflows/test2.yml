@@ -29,6 +29,12 @@ jobs:
           resource-group-name: github-cicd
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template-file: infra/storageaccount.bicep
-          parameters: >
-            storageAccountName=storagedemo15mpsw3
-            location=eastus
+          parameters: |
+            {
+              "storageAccountName": {
+                "value": "storagedemo15mpsw3"
+              },
+              "location": {
+                "value": "eastus"
+              }
+            }
