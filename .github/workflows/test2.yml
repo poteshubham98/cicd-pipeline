@@ -30,10 +30,6 @@ jobs:
           template-file: infra/storageaccount.bicep
           parameters: |
             {
-              "storageAccountName": {
-                "value": "storagedemo15mpsw3"
-              },
-              "location": {
-                "value": "eastus"
-              }
+              "storageAccountName": "storagedemo15mpsw3",
+              "location": "eastus"
             }
