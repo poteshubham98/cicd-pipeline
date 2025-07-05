@@ -24,8 +24,7 @@ jobs:
           type: deployment
           operation: create
           name: StorageDeployment
-          location: eastus
-          scope: resourceGroup
+          scope: resourcegroup
           resource-group-name: github-cicd
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           template-file: infra/storageaccount.bicep
