@@ -3,6 +3,36 @@ param stamp string
 param envType string
 param region string
 
+
+
+// VNet name: <prefix>-shared-ntwk-<envType>-<stamp>
+resource vnet 'Microsoft.Network/virtualNetworks@2022-07-01' = {
+  name: '${prefix}-shared-ntwk-${envType}-${stamp}'
+  location: region
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        '10.0.0.0/16'
+      ]
+    }
+    subnets: [
+      {
+        name: 'AzureBastionSubnet'
+        properties: {
+          addressPrefix: '10.0.1.0/24'
+        }
+      }
+      {
+        name: 'default'
+        properties: {
+          addressPrefix: '10.0.2.0/24'
+        }
+      }
+    ]
+  }
+}
+
+// Derived Storage Account
 resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
   name: '${prefix}dataopssaderiv${envType}${stamp}'
   location: region
@@ -23,41 +53,46 @@ resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
     largeFileSharesState: 'Enabled'
     isHnsEnabled: true
     networkAcls: {
-      resourceAccessRules: []
       bypass: 'AzureServices'
+      defaultAction: 'Deny'
       virtualNetworkRules: [
         {
-          id: '${subscription().id}/resourceGroups/rg-${prefix}-shared-infra-${envType}-${stamp}/providers/Microsoft.Network/virtualNetworks/${prefix}-shared-ntwk-${envType}-${stamp}/subnets/AzureBastionSubnet'
+          id: '${vnet.id}/subnets/AzureBastionSubnet'
           action: 'Allow'
           state: 'Succeeded'
         }
         {
-          id: '${subscription().id}/resourceGroups/rg-${prefix}-shared-infra-${envType}-${stamp}/providers/Microsoft.Network/virtualNetworks/${prefix}-shared-ntwk-${envType}-${stamp}/subnets/default'
+          id: '${vnet.id}/subnets/default'
           action: 'Allow'
           state: 'Succeeded'
         }
       ]
       ipRules: []
-      defaultAction: 'Deny'
+      resourceAccessRules: []
     }
     supportsHttpsTrafficOnly: true
     encryption: {
+      keySource: 'Microsoft.Storage'
       requireInfrastructureEncryption: false
       services: {
-        file: {
-          keyType: 'Account'
-          enabled: true
-        }
         blob: {
           keyType: 'Account'
           enabled: true
         }
+        file: {
+          keyType: 'Account'
+          enabled: true
+        }
       }
-      keySource: 'Microsoft.Storage'
     }
     accessTier: 'Hot'
   }
+
+  dependsOn: [
+    vnet
+  ]
 }
+
 
 resource derived_blobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' = {
   parent: derived
