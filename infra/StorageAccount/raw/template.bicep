@@ -8,7 +8,6 @@ resource raw 'Microsoft.Storage/storageAccounts@2023-04-01' = {
   location: region
   sku: {
     name: 'Standard_ZRS'
-    tier: 'Standard'
   }
   kind: 'StorageV2'
   properties: {
@@ -51,10 +50,6 @@ resource raw 'Microsoft.Storage/storageAccounts@2023-04-01' = {
 resource raw_blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' = {
   parent: raw
   name: 'default'
-  sku: {
-    name: 'Standard_ZRS'
-    tier: 'Standard'
-  }
   properties: {
     containerDeleteRetentionPolicy: {
       enabled: true
@@ -79,7 +74,4 @@ resource raw_container 'Microsoft.Storage/storageAccounts/blobServices/container
     denyEncryptionScopeOverride: false
     publicAccess: 'None'
   }
-  dependsOn: [
-    raw
-  ]
 }
