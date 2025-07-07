@@ -3,24 +3,30 @@ param stamp string
 param envType string
 param region string
 
+// Deploy Storage Account for Batch autoStorage
+resource batchStorage 'Microsoft.Storage/storageAccounts@2023-04-01' = {
+  name: '${prefix}dataopsbatch${envType}${stamp}'
+  location: region
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+  properties: {
+    accessTier: 'Hot'
+  }
+}
+
+// Deploy Batch Account using the above storage
 resource batch_account 'Microsoft.Batch/batchAccounts@2024-02-01' = {
   name: 'tcsdataopsbatch${envType}${stamp}'
   location: region
   properties: {
     autoStorage: {
-      storageAccountId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Storage/storageAccounts/${prefix}dataopsbatch${envType}${stamp}'
+      storageAccountId: batchStorage.id
       authenticationMode: 'StorageKeys'
     }
     poolAllocationMode: 'BatchService'
     publicNetworkAccess: 'Enabled'
-    networkProfile: {
-      accountAccess: {
-        defaultAction: 'Allow'
-      }
-      nodeManagementAccess: {
-        defaultAction: 'Allow'
-      }
-    }
     encryption: {
       keySource: 'Microsoft.Batch'
     }
@@ -32,6 +38,7 @@ resource batch_account 'Microsoft.Batch/batchAccounts@2024-02-01' = {
   }
 }
 
+// Execution pool
 resource executionpool 'Microsoft.Batch/batchAccounts/pools@2024-02-01' = {
   parent: batch_account
   name: 'tcsdataops-executionpool'
@@ -89,6 +96,7 @@ resource executionpool 'Microsoft.Batch/batchAccounts/pools@2024-02-01' = {
   }
 }
 
+// Orchestrator pool
 resource orchestratorpool 'Microsoft.Batch/batchAccounts/pools@2024-02-01' = {
   parent: batch_account
   name: 'tcsdataops-orchestratorpool'
@@ -145,3 +153,5 @@ resource orchestratorpool 'Microsoft.Batch/batchAccounts/pools@2024-02-01' = {
     targetNodeCommunicationMode: 'Default'
   }
 }
+
+output batchAccountName string = batch_account.name
