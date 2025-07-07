@@ -12,39 +12,39 @@ param envType string
 param region string
 
 
-// Raw Storage Account
-module raw 'StorageAccount/raw/template.bicep' = {
-  name: 'Raw_StorageModule'
-  params: {
-    prefix: prefix
-    stamp: stamp
-    envType: envType
-    region: region
-  }
-}
+// // Raw Storage Account
+// module raw 'StorageAccount/raw/template.bicep' = {
+//   name: 'Raw_StorageModule'
+//   params: {
+//     prefix: prefix
+//     stamp: stamp
+//     envType: envType
+//     region: region
+//   }
+// }
 
-// Derived Storage Account
-module derived 'StorageAccount/derived/template.bicep' = {
-  name: 'Derived_StorageModule'
-  params: {
-    prefix: prefix
-    stamp: stamp
-    envType: envType
-    region: region
+// // Derived Storage Account
+// module derived 'StorageAccount/derived/template.bicep' = {
+//   name: 'Derived_StorageModule'
+//   params: {
+//     prefix: prefix
+//     stamp: stamp
+//     envType: envType
+//     region: region
     
-  }
-}
+//   }
+// }
 
-// Landing Storage Account
-module landing 'StorageAccount/landing/template.bicep' = {
-  name: 'Landing_StorageModule'
-  params: {
-    prefix: prefix
-    stamp: stamp
-    envType: envType
-    region: region
-  }
-}
+// // Landing Storage Account
+// module landing 'StorageAccount/landing/template.bicep' = {
+//   name: 'Landing_StorageModule'
+//   params: {
+//     prefix: prefix
+//     stamp: stamp
+//     envType: envType
+//     region: region
+//   }
+// }
 
 // //databricks module
 // module databricks 'Databricks/template.bicep' = {

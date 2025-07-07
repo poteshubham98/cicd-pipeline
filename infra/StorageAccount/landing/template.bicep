@@ -1,14 +1,13 @@
 param prefix string
 param stamp string
 param envType string
-param region string 
+param region string
 
-resource landing 'Microsoft.Storage/storageAccounts@2023-04-01' = {
-  name: '${prefix}dataopssaland${envType}${stamp}'
+resource enriched 'Microsoft.Storage/storageAccounts@2023-04-01' = {
+  name: '${prefix}dataopssaenric${envType}${stamp}'
   location: region
   sku: {
-    name: 'Standard_LRS'
-    tier: 'Standard'
+    name: 'Standard_LRS' // Using LRS for max compatibility
   }
   kind: 'StorageV2'
   properties: {
@@ -16,18 +15,16 @@ resource landing 'Microsoft.Storage/storageAccounts@2023-04-01' = {
     defaultToOAuthAuthentication: true
     publicNetworkAccess: 'Enabled'
     allowCrossTenantReplication: false
-    isNfsV3Enabled: true
+    isNfsV3Enabled: false // ✅ NFS disabled to allow simple networking
     isSftpEnabled: false
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: true
     allowSharedKeyAccess: true
     largeFileSharesState: 'Enabled'
-    isHnsEnabled: true
+    isHnsEnabled: true // ✅ Still enabled for ADLS Gen2
     networkAcls: {
-      resourceAccessRules: []
       bypass: 'AzureServices'
-      ipRules: []
-      defaultAction: 'Deny'
+      defaultAction: 'Allow' // ✅ Allowed now since NFS is disabled
     }
     supportsHttpsTrafficOnly: true
     encryption: {
@@ -48,13 +45,9 @@ resource landing 'Microsoft.Storage/storageAccounts@2023-04-01' = {
   }
 }
 
-resource landing_blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' = {
-  parent: landing
+resource enriched_blobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' = {
+  parent: enriched
   name: 'default'
-  sku: {
-    name: 'Standard_LRS'
-    tier: 'Standard'
-  }
   properties: {
     containerDeleteRetentionPolicy: {
       enabled: true
@@ -71,30 +64,22 @@ resource landing_blobService 'Microsoft.Storage/storageAccounts/blobServices@202
   }
 }
 
-resource landing_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
-  parent: landing_blobService
-  name: 'landing'
+resource annotated_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
+  parent: enriched_blobServices
+  name: 'annotated'
   properties: {
     defaultEncryptionScope: '$account-encryption-key'
     denyEncryptionScopeOverride: false
     publicAccess: 'None'
   }
-  dependsOn: [
-    landing
-  ]
 }
 
-resource rosbag_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
-  parent: landing_blobService
-  name: 'rosbag'
+resource labelled_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
+  parent: enriched_blobServices
+  name: 'labelled'
   properties: {
     defaultEncryptionScope: '$account-encryption-key'
     denyEncryptionScopeOverride: false
     publicAccess: 'None'
   }
-  dependsOn: [
-    landing
-  ]
 }
-
-output landingaccountKey string = listKeys(landing.id, '2023-04-01').keys[0].value
