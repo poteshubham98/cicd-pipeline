@@ -24,16 +24,18 @@ module raw 'StorageAccount/raw/template.bicep' = {
   }
 }
 
-// Derived Storage Account
-module derived 'StorageAccount/derived/template.bicep' = {
-  name: 'Derived_StorageModule'
-  params: {
-    prefix: prefix
-    stamp: stamp
-    envType: envType
-    region: region
-  }
-}
+// // Derived Storage Account
+// module derived 'StorageAccount/derived/template.bicep' = {
+//   name: 'Derived_StorageModule'
+//   params: {
+//     prefix: prefix
+//     stamp: stamp
+//     envType: envType
+//     region: region
+//     tenantId: tenantId
+//     subscriptionId: subscriptionId
+//   }
+// }
 
 // // Landing Storage Account
 // module landing 'StorageAccount/landing/template.bicep' = {
