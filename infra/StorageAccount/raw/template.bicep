@@ -15,7 +15,7 @@ resource raw 'Microsoft.Storage/storageAccounts@2023-04-01' = {
     defaultToOAuthAuthentication: true
     publicNetworkAccess: 'Disabled'
     allowCrossTenantReplication: false
-    isNfsV3Enabled: true
+    isNfsV3Enabled: false
     isSftpEnabled: false
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: true
