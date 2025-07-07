@@ -2,35 +2,36 @@ param prefix string
 param stamp string
 param envType string
 param region string
+param tenantId string
+param subscriptionId string
 //param userObjectId string // your Azure AD object ID (for RBAC)
 
-// Create Storage Account
+
+// Construct resource ID for resource access rules (adjust if needed)
+var resourceId = '/subscriptions/${subscriptionId}/resourceGroups/rg-${prefix}-${envType}-${stamp}/providers/Microsoft.MachineLearningServices/workspaces/mymlworkspace'
+
+// Derived Storage Account
 resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
-  name: toLower('${prefix}deriv${envType}${stamp}')
+  name: '${prefix}dataopssaderiv${envType}${stamp}'
   location: region
   sku: {
     name: 'Standard_ZRS'
   }
   kind: 'StorageV2'
   properties: {
+    dnsEndpointType: 'Standard'
     defaultToOAuthAuthentication: true
     publicNetworkAccess: 'Enabled'
     allowCrossTenantReplication: false
-    isNfsV3Enabled: true // Optional: only if supported
+    isNfsV3Enabled: true
     isSftpEnabled: false
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: false
     allowSharedKeyAccess: true
     largeFileSharesState: 'Enabled'
     isHnsEnabled: true
-    networkAcls: {
-      bypass: 'AzureServices'
-      defaultAction: 'Allow'
-      ipRules: []
-      resourceAccessRules: []
-      virtualNetworkRules: []
-    }
     supportsHttpsTrafficOnly: true
+    accessTier: 'Hot'
     encryption: {
       keySource: 'Microsoft.Storage'
       requireInfrastructureEncryption: false
@@ -45,12 +46,23 @@ resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
         }
       }
     }
-    accessTier: 'Hot'
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny' // Required for NFS
+      ipRules: []
+      virtualNetworkRules: []
+      resourceAccessRules: [
+        {
+          tenantId: tenantId
+          resourceId: resourceId
+        }
+      ]
+    }
   }
 }
 
-// Blob Service Config
-resource derived_blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' = {
+// Blob Service
+resource derived_blobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' = {
   parent: derived
   name: 'default'
   properties: {
@@ -58,20 +70,21 @@ resource derived_blobService 'Microsoft.Storage/storageAccounts/blobServices@202
       enabled: true
       days: 7
     }
-    cors: {
-      corsRules: []
-    }
     deleteRetentionPolicy: {
       allowPermanentDelete: false
       enabled: true
       days: 7
     }
+    cors: {
+      corsRules: []
+    }
   }
 }
 
 // Blob Containers
+
 resource curated_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
-  parent: derived_blobService
+  parent: derived_blobServices
   name: 'curated'
   properties: {
     defaultEncryptionScope: '$account-encryption-key'
@@ -81,7 +94,7 @@ resource curated_container 'Microsoft.Storage/storageAccounts/blobServices/conta
 }
 
 resource extracted_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
-  parent: derived_blobService
+  parent: derived_blobServices
   name: 'extracted'
   properties: {
     defaultEncryptionScope: '$account-encryption-key'
@@ -91,7 +104,7 @@ resource extracted_container 'Microsoft.Storage/storageAccounts/blobServices/con
 }
 
 resource synchronized_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
-  parent: derived_blobService
+  parent: derived_blobServices
   name: 'synchronized'
   properties: {
     defaultEncryptionScope: '$account-encryption-key'
