@@ -68,7 +68,17 @@ param region string
 //   }
 // }
 
-
+//azure batch module
+module az_batch 'AzureBatch/BatchTemplate/template.bicep' = {
+  name:'az_batch_module'
+  params:{
+    prefix:prefix
+    stamp:stamp
+    envType:envType
+    region: region
+    //containerRegistry_password: kv.getSecret('acrpasskey')    //container registry password from access key
+  }
+}
 //datafactory module
 module datafactory 'ADF/ADFTemplate/template.bicep' = {
   name: 'datafactoryModule'
