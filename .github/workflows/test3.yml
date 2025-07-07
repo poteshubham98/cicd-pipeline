@@ -1,4 +1,4 @@
-name: Deploy Raw Storage Account
+name: Deploy Raw+Derived Storage Account
 
 on:
   workflow_dispatch:
