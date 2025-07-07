@@ -1,9 +1,7 @@
 param prefix string
 param stamp string
 param envType string
-param region string 
-
-var managedResourceGroupId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/DatabricksManagedRG'
+param region string
 
 resource databricks 'Microsoft.Databricks/workspaces@2024-02-01-preview' = {
   name: '${prefix}-dataops-databricks-${envType}-${stamp}'
@@ -15,9 +13,11 @@ resource databricks 'Microsoft.Databricks/workspaces@2024-02-01-preview' = {
     defaultCatalog: {
       initialType: 'UnityCatalog'
     }
-    managedResourceGroupId: managedResourceGroupId
-    prepareEncryption: false
-    requireInfrastructureEncryption: false
+    parameters: {
+      enableNoPublicIp: {
+        value: false // ← Public IPs are OK
+      }
+    }
   }
 }
 
