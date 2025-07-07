@@ -79,16 +79,16 @@ module az_batch 'AzureBatch/BatchTemplate/template.bicep' = {
     //containerRegistry_password: kv.getSecret('acrpasskey')    //container registry password from access key
   }
 }
-//datafactory module
-module datafactory 'ADF/ADFTemplate/template.bicep' = {
-  name: 'datafactoryModule'
-  params: {
-    prefix:prefix
-    stamp:stamp
-    envType:envType
-    region: region
-  }
-}
+// //datafactory module
+// module datafactory 'ADF/ADFTemplate/template.bicep' = {
+//   name: 'datafactoryModule'
+//   params: {
+//     prefix:prefix
+//     stamp:stamp
+//     envType:envType
+//     region: region
+//   }
+// }
 
 
 
