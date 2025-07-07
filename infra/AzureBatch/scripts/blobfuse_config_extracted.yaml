@@ -1,0 +1,33 @@
+logging:
+  type: syslog
+  level: log_debug
+
+components:
+  - libfuse
+  - block_cache
+  - attr_cache
+  - azstorage
+
+
+libfuse:
+  attribute-expiration-sec: 120
+  entry-expiration-sec: 120
+  negative-entry-expiration-sec: 240
+
+block_cache:
+  block-size-mb: 32
+  prefetch: 100
+  parallelism: 256
+  disk-size-mb: 600000
+  path: /blobfuse/cache/extracted
+
+attr_cache:
+  timeout-sec: 7200
+
+azstorage:
+  type: adls
+  account-name: avtmdataopssaderivtst001
+  account-key: EwNWHyjm/csC3CDQ4luybZdhgnwfCUjXPkIiALwWR3t43+ZrY2+Q5WgYyli5x0UTkW4w9EIWFLHF+AStSWyRQQ==
+  endpoint: https://avtmdataopssaderivtst001.blob.core.windows.net # https://avtmdataopssaderivtst001.dfs.core.windows.net 
+  mode: key
+  container: extracted
