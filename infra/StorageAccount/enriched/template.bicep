@@ -7,7 +7,7 @@ resource enriched 'Microsoft.Storage/storageAccounts@2023-04-01' = {
   name: '${prefix}dataopssaenric${envType}${stamp}'
   location: region
   sku: {
-    name: 'Standard_ZRS' // ✅ This is sufficient — no `tier` needed
+    name: 'Standard_LRS' // Using LRS for max compatibility
   }
   kind: 'StorageV2'
   properties: {
@@ -15,16 +15,16 @@ resource enriched 'Microsoft.Storage/storageAccounts@2023-04-01' = {
     defaultToOAuthAuthentication: true
     publicNetworkAccess: 'Enabled'
     allowCrossTenantReplication: false
-    isNfsV3Enabled: true
+    isNfsV3Enabled: false // ✅ NFS disabled to allow simple networking
     isSftpEnabled: false
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: true
     allowSharedKeyAccess: true
     largeFileSharesState: 'Enabled'
-    isHnsEnabled: true
+    isHnsEnabled: true // ✅ Still enabled for ADLS Gen2
     networkAcls: {
       bypass: 'AzureServices'
-      defaultAction: 'Allow'
+      defaultAction: 'Allow' // ✅ Allowed now since NFS is disabled
     }
     supportsHttpsTrafficOnly: true
     encryption: {
@@ -48,7 +48,6 @@ resource enriched 'Microsoft.Storage/storageAccounts@2023-04-01' = {
 resource enriched_blobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' = {
   parent: enriched
   name: 'default'
-  // ❌ Remove this block — it's not allowed here and causes a warning
   properties: {
     containerDeleteRetentionPolicy: {
       enabled: true
