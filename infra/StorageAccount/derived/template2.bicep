@@ -3,30 +3,66 @@ param stamp string
 param envType string
 param region string
 
+// Create Virtual Network
+resource vnet 'Microsoft.Network/virtualNetworks@2022-07-01' = {
+  name: '${prefix}-shared-ntwk-${envType}-${stamp}'
+  location: region
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        '10.0.0.0/16'
+      ]
+    }
+    subnets: [
+      {
+        name: 'AzureBastionSubnet'
+        properties: {
+          addressPrefix: '10.0.1.0/24'
+        }
+      }
+      {
+        name: 'default'
+        properties: {
+          addressPrefix: '10.0.2.0/24'
+        }
+      }
+    ]
+  }
+}
+
 // Create Derived Storage Account
 resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
-  name: toLower('${prefix}deriv${envType}${stamp}')
+  name: '${prefix}deriv${envType}${stamp}'
   location: region
   sku: {
     name: 'Standard_ZRS'
   }
   kind: 'StorageV2'
   properties: {
-    // Removed: dnsEndpointType (not valid here)
+    dnsEndpointType: 'Standard'
     defaultToOAuthAuthentication: true
     publicNetworkAccess: 'Enabled'
     allowCrossTenantReplication: false
-    // Commented out to avoid unsupported errors depending on region/SKU
-    // isNfsV3Enabled: true
+    isNfsV3Enabled: true
     isSftpEnabled: false
     minimumTlsVersion: 'TLS1_2'
-    allowBlobPublicAccess: false
+    allowBlobPublicAccess: true
     allowSharedKeyAccess: true
     largeFileSharesState: 'Enabled'
     isHnsEnabled: true
     networkAcls: {
       bypass: 'AzureServices'
-      defaultAction: 'Allow' // Changed to 'Allow' since no VNet restrictions
+      defaultAction: 'Deny'
+      virtualNetworkRules: [
+        {
+          id: '${vnet.id}/subnets/AzureBastionSubnet'
+          action: 'Allow'
+        }
+        {
+          id: '${vnet.id}/subnets/default'
+          action: 'Allow'
+        }
+      ]
       ipRules: []
       resourceAccessRules: []
     }
@@ -47,6 +83,10 @@ resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
     }
     accessTier: 'Hot'
   }
+
+  dependsOn: [
+    vnet
+  ]
 }
 
 // Create Blob Services
@@ -92,7 +132,7 @@ resource extracted_container 'Microsoft.Storage/storageAccounts/blobServices/con
 
 resource synchronized_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
   parent: derived_blobServices
-  name: 'synchronized'
+  name: 'synchronizeed'
   properties: {
     defaultEncryptionScope: '$account-encryption-key'
     denyEncryptionScopeOverride: false
