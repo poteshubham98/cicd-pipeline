@@ -27,7 +27,7 @@ attr_cache:
 azstorage:
   type: adls
   account-name: avtmdataopssalandtst001
-  account-key: T0UA6dPd4kgXDDlAVi3cK9Yx+cxKAgmVvtTFHryATXk4CLK1bI9nL4cerFMuFn3BYkbmBKcRe/6T+ASteYvmOw==
+  account-key: 
   endpoint: https://avtmdataopssalandtst001.blob.core.windows.net # https://avtmdataopssalandtst001.dfs.core.windows.net 
   mode: key
   container: landing
