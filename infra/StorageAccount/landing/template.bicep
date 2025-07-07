@@ -55,7 +55,6 @@ resource landing_blobService 'Microsoft.Storage/storageAccounts/blobServices@202
   name: 'default'
   sku: {
     name: 'Standard_LRS'
-    tier: 'Standard'
   }
   properties: {
     containerDeleteRetentionPolicy: {

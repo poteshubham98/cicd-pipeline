@@ -7,7 +7,7 @@ param region string
 
 
 // Construct resource ID for resource access rules (adjust if needed)
-var resourceId = '/subscriptions/${subscriptionId}/resourceGroups/rg-${prefix}-${envType}-${stamp}/providers/Microsoft.MachineLearningServices/workspaces/mymlworkspace'
+// var resourceId = '/subscriptions/${subscriptionId}/resourceGroups/rg-${prefix}-${envType}-${stamp}/providers/Microsoft.MachineLearningServices/workspaces/mymlworkspace'
 
 // Derived Storage Account
 resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
