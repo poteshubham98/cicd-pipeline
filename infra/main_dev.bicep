@@ -35,16 +35,16 @@ module derived 'StorageAccount/derived/template.bicep' = {
   }
 }
 
-// // Landing Storage Account
-// module landing 'StorageAccount/landing/template.bicep' = {
-//   name: 'Landing_StorageModule'
-//   params: {
-//     prefix: prefix
-//     stamp: stamp
-//     envType: envType
-//     region: region
-//   }
-// }
+// Landing Storage Account
+module landing 'StorageAccount/landing/template.bicep' = {
+  name: 'Landing_StorageModule'
+  params: {
+    prefix: prefix
+    stamp: stamp
+    envType: envType
+    region: region
+  }
+}
 
 // //databricks module
 // module databricks 'Databricks/template.bicep' = {
