@@ -57,18 +57,16 @@ module landing 'StorageAccount/landing/template.bicep' = {
 //   }
 // }
 
-// // Enriched Storage Account
-// module enriched 'StorageAccount/enriched/template.bicep' = {
-//   name: 'Enriched_StorageModule'
-//   params: {
-//     prefix: prefix
-//     stamp: stamp
-//     envType: envType
-//     region: region
-//     tenantId: tenantId
-//     resourceId: resourceId
-//   }
-// }
+// Enriched Storage Account
+module enriched 'StorageAccount/enriched/template.bicep' = {
+  name: 'Enriched_StorageModule'
+  params: {
+    prefix: prefix
+    stamp: stamp
+    envType: envType
+    region: region
+  }
+}
 
 
 // // Raw Storage Account
