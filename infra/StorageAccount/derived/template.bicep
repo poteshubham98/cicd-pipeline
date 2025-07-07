@@ -32,7 +32,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-07-01' = {
 
 // Create Derived Storage Account
 resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
-  name: '${prefix}dataopssaderiv${envType}${stamp}'
+  name: '${prefix}deriv${envType}${stamp}'
   location: region
   sku: {
     name: 'Standard_ZRS'
