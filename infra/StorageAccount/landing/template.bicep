@@ -1,38 +1,36 @@
 param prefix string
 param stamp string
 param envType string
-param region string
-//param userObjectId string // Azure AD object ID for RBAC
+param region string 
 
-// Create Landing Storage Account
 resource landing 'Microsoft.Storage/storageAccounts@2023-04-01' = {
-  name: toLower('${prefix}land${envType}${stamp}')  // ensure <=24 chars and lowercase
+  name: '${prefix}dataopssaland${envType}${stamp}'
   location: region
   sku: {
     name: 'Standard_LRS'
+    tier: 'Standard'
   }
   kind: 'StorageV2'
   properties: {
+    dnsEndpointType: 'Standard'
     defaultToOAuthAuthentication: true
     publicNetworkAccess: 'Enabled'
     allowCrossTenantReplication: false
-    isNfsV3Enabled: true  // Optional: enable only if supported
+    isNfsV3Enabled: true
     isSftpEnabled: false
     minimumTlsVersion: 'TLS1_2'
-    allowBlobPublicAccess: false
+    allowBlobPublicAccess: true
     allowSharedKeyAccess: true
     largeFileSharesState: 'Enabled'
     isHnsEnabled: true
     networkAcls: {
+      resourceAccessRules: []
       bypass: 'AzureServices'
       ipRules: []
-      resourceAccessRules: []
-      virtualNetworkRules: []
-      defaultAction: 'Allow' // Allow access since no VNet restriction
+      defaultAction: 'Deny'
     }
     supportsHttpsTrafficOnly: true
     encryption: {
-      keySource: 'Microsoft.Storage'
       requireInfrastructureEncryption: false
       services: {
         file: {
@@ -44,17 +42,18 @@ resource landing 'Microsoft.Storage/storageAccounts@2023-04-01' = {
           enabled: true
         }
       }
+      keySource: 'Microsoft.Storage'
     }
     accessTier: 'Hot'
   }
 }
 
-// Blob Service Configuration
 resource landing_blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-04-01' = {
   parent: landing
   name: 'default'
   sku: {
     name: 'Standard_LRS'
+    tier: 'Standard'
   }
   properties: {
     containerDeleteRetentionPolicy: {
@@ -72,8 +71,6 @@ resource landing_blobService 'Microsoft.Storage/storageAccounts/blobServices@202
   }
 }
 
-// Blob Containers
-
 resource landing_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
   parent: landing_blobService
   name: 'landing'
@@ -82,6 +79,9 @@ resource landing_container 'Microsoft.Storage/storageAccounts/blobServices/conta
     denyEncryptionScopeOverride: false
     publicAccess: 'None'
   }
+  dependsOn: [
+    landing
+  ]
 }
 
 resource rosbag_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-04-01' = {
@@ -92,18 +92,9 @@ resource rosbag_container 'Microsoft.Storage/storageAccounts/blobServices/contai
     denyEncryptionScopeOverride: false
     publicAccess: 'None'
   }
+  dependsOn: [
+    landing
+  ]
 }
 
-// // RBAC Role Assignment to User
-// resource landingBlobRBAC 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-//   name: guid(landing.id, 'StorageBlobDataContributor', userObjectId)
-//   scope: landing
-//   properties: {
-//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Blob Data Contributor
-//     principalId: userObjectId
-//     principalType: 'User'
-//   }
-// }
-
-// Output storage account key (if you need shared key access for tools like Storage Explorer)
 output landingaccountKey string = listKeys(landing.id, '2023-04-01').keys[0].value
