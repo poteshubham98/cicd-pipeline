@@ -46,16 +46,16 @@ param region string
 //   }
 // }
 
-//databricks module
-module databricks 'Databricks/template.bicep' = {
-  name: 'DatabricksModule'
-  params: {
-    prefix:prefix
-    stamp:stamp
-    envType:envType
-    region: region
-  }
-}
+// //databricks module
+// module databricks 'Databricks/template.bicep' = {
+//   name: 'DatabricksModule'
+//   params: {
+//     prefix:prefix
+//     stamp:stamp
+//     envType:envType
+//     region: region
+//   }
+// }
 
 // // Enriched Storage Account
 // module enriched 'StorageAccount/enriched/template.bicep' = {
@@ -69,7 +69,16 @@ module databricks 'Databricks/template.bicep' = {
 // }
 
 
-
+//datafactory module
+module datafactory 'ADF/ADFTemplate/template.bicep' = {
+  name: 'datafactoryModule'
+  params: {
+    prefix:prefix
+    stamp:stamp
+    envType:envType
+    region: region
+  }
+}
 
 
 
