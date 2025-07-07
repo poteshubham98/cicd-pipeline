@@ -10,8 +10,7 @@ param prefix string
 param stamp string
 param envType string
 param region string
-param tenantId string
-param subscriptionId string
+
 
 // Raw Storage Account
 module raw 'StorageAccount/raw/template.bicep' = {

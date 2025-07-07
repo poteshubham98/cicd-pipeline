@@ -2,8 +2,7 @@ param prefix string
 param stamp string
 param envType string
 param region string
-param tenantId string
-param subscriptionId string
+
 //param userObjectId string // your Azure AD object ID (for RBAC)
 
 
