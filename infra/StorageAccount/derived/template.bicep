@@ -16,7 +16,7 @@ resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
     defaultToOAuthAuthentication: true
     publicNetworkAccess: 'Enabled'
     allowCrossTenantReplication: false
-    // isNfsV3Enabled: true // Optional: only if supported
+    isNfsV3Enabled: true // Optional: only if supported
     isSftpEnabled: false
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: false
