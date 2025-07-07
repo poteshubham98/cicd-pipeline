@@ -2,7 +2,7 @@ param prefix string
 param stamp string
 param envType string
 param region string
-param userObjectId string // Azure AD object ID for RBAC
+//param userObjectId string // Azure AD object ID for RBAC
 
 // Create Landing Storage Account
 resource landing 'Microsoft.Storage/storageAccounts@2023-04-01' = {
@@ -10,7 +10,6 @@ resource landing 'Microsoft.Storage/storageAccounts@2023-04-01' = {
   location: region
   sku: {
     name: 'Standard_LRS'
-    tier: 'Standard'
   }
   kind: 'StorageV2'
   properties: {
@@ -96,16 +95,16 @@ resource rosbag_container 'Microsoft.Storage/storageAccounts/blobServices/contai
   }
 }
 
-// RBAC Role Assignment to User
-resource landingBlobRBAC 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(landing.id, 'StorageBlobDataContributor', userObjectId)
-  scope: landing
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Blob Data Contributor
-    principalId: userObjectId
-    principalType: 'User'
-  }
-}
+// // RBAC Role Assignment to User
+// resource landingBlobRBAC 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+//   name: guid(landing.id, 'StorageBlobDataContributor', userObjectId)
+//   scope: landing
+//   properties: {
+//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Blob Data Contributor
+//     principalId: userObjectId
+//     principalType: 'User'
+//   }
+// }
 
 // Output storage account key (if you need shared key access for tools like Storage Explorer)
 output landingaccountKey string = listKeys(landing.id, '2023-04-01').keys[0].value

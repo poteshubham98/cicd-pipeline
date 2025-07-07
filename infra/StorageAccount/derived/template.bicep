@@ -2,7 +2,7 @@ param prefix string
 param stamp string
 param envType string
 param region string
-param userObjectId string // your Azure AD object ID (for RBAC)
+//param userObjectId string // your Azure AD object ID (for RBAC)
 
 // Create Storage Account
 resource derived 'Microsoft.Storage/storageAccounts@2023-04-01' = {
@@ -100,16 +100,16 @@ resource synchronized_container 'Microsoft.Storage/storageAccounts/blobServices/
   }
 }
 
-// RBAC Role Assignment to User
-resource derivedBlobRBAC 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(derived.id, 'StorageBlobDataContributor', userObjectId)
-  scope: derived
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Blob Data Contributor
-    principalId: userObjectId
-    principalType: 'User'
-  }
-}
+// // RBAC Role Assignment to User
+// resource derivedBlobRBAC 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+//   name: guid(derived.id, 'StorageBlobDataContributor', userObjectId)
+//   scope: derived
+//   properties: {
+//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Blob Data Contributor
+//     principalId: userObjectId
+//     principalType: 'User'
+//   }
+// }
 
 // Output storage account key (for Shared Key access if needed)
 output derivedaccountKey string = listKeys(derived.id, '2023-04-01').keys[0].value

@@ -33,17 +33,41 @@ module derived 'StorageAccount/derived/template.bicep' = {
   }
 }
 
+// Landing Storage Account
+module landing 'StorageAccount/landing/template.bicep' = {
+  name: 'Landing_StorageModule'
+  params: {
+    prefix: prefix
+    stamp: stamp
+    envType: envType
+    region: region
+  }
+}
 
-// // Landing Storage Account
-// module landing 'StorageAccount/landing/template.bicep' = {
-//   name: 'Landing_StorageModule'
+//databricks module
+module databricks 'Databricks/template.bicep' = {
+  name: 'DatabricksModule'
+  params: {
+    prefix:prefix
+    stamp:stamp
+    envType:envType
+    region: region
+  }
+}
+
+// // Enriched Storage Account
+// module enriched 'StorageAccount/enriched/template.bicep' = {
+//   name: 'Enriched_StorageModule'
 //   params: {
 //     prefix: prefix
 //     stamp: stamp
 //     envType: envType
 //     region: region
+//     tenantId: tenantId
+//     resourceId: resourceId
 //   }
 // }
+
 
 // // Raw Storage Account
 // module raw 'StorageAccount/raw/template.bicep' = {
@@ -58,15 +82,4 @@ module derived 'StorageAccount/derived/template.bicep' = {
 
 
 
-// // Enriched Storage Account
-// module enriched 'StorageAccount/enriched/template.bicep' = {
-//   name: 'Enriched_StorageModule'
-//   params: {
-//     prefix: prefix
-//     stamp: stamp
-//     envType: envType
-//     region: region
-//     tenantId: tenantId
-//     resourceId: resourceId
-//   }
-// }
+
