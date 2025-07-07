@@ -24,7 +24,7 @@ module raw 'StorageAccount/raw/template.bicep' = {
 }
 
 // Derived Storage Account
-module derived 'StorageAccount/derived/template2.bicep' = {
+module derived 'StorageAccount/derived/template.bicep' = {
   name: 'Derived_StorageModule'
   params: {
     prefix: prefix
