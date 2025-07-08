@@ -137,15 +137,15 @@ resource batchStorageLinkedService 'Microsoft.DataFactory/factories/linkedServic
 // }
 
 //Refering to an existing linked service
-resource linkedService1 'Microsoft.DataFactory/factories/linkedServices@2018-06-01' existing = {
-  parent: dataFactory
-  name: 'LS_Landing'
-}
+// resource linkedService1 'Microsoft.DataFactory/factories/linkedServices@2018-06-01' existing = {
+//   parent: dataFactory
+//   name: 'LS_Landing'
+// }
 
-resource linkedService2 'Microsoft.DataFactory/factories/linkedServices@2018-06-01' existing = {
-  parent: dataFactory
-  name: 'LS_Extracted'
-}
+// resource linkedService2 'Microsoft.DataFactory/factories/linkedServices@2018-06-01' existing = {
+//   parent: dataFactory
+//   name: 'LS_Extracted'
+// }
 
 resource ds_embeddedimages 'Microsoft.DataFactory/factories/datasets@2018-06-01' = {
   name: '${prefix}dataops_embedimg${envType}${stamp}'
