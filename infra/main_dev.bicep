@@ -79,55 +79,66 @@ module databricks 'Databricks/template.bicep' = {
 //     //containerRegistry_password: kv.getSecret('acrpasskey')    //container registry password from access key
 //   }
 // }
-// //datafactory module
-// module datafactory 'ADF/ADFTemplate/template.bicep' = {
-//   name: 'datafactoryModule'
-//   params: {
-//     prefix:prefix
-//     stamp:stamp
-//     envType:envType
-//     region: region
-//   }
-// }
 
-
-//linked service module
-module ADLS_LinkedService 'LinkedService/ADLS-DB-LinkService/template.bicep' = {
-  name: 'ADLS-DB_Module'
+//datafactory module
+module datafactory 'ADF/ADFTemplate/adfsetup.bicep' = {
+  name: 'datafactoryModule'
   params: {
     prefix:prefix
     stamp:stamp
     envType:envType
-    // accessKey:kv.getSecret('databrickspasskey')         //access token after launching the databricks->settings->developer->manage access token->generate access token
-  }
-  dependsOn: [
-    databricks
-  ]
-}
-
-//batch linked service module
-module Batch_LinkedService 'LinkedService/AzureBatchLinkService/template.bicep' = {
-  name: 'Batch_LinkedServiceModule'
-  params: {
-    envType: envType
-    prefix: prefix
-    stamp: stamp
     region: region
-    // accessKey: kv.getSecret('batchpasskey')     //Primary access key from Keys in batch account
   }
 }
 
 
-//dataset module
-module datasets 'Dataset/template.bicep' = {
-  name: 'DatasetsModule'
+// //linked service module
+// module ADLS_LinkedService 'LinkedService/ADLS-DB-LinkService/template.bicep' = {
+//   name: 'ADLS-DB_Module'
+//   params: {
+//     prefix:prefix
+//     stamp:stamp
+//     envType:envType
+//     // accessKey:kv.getSecret('databrickspasskey')         //access token after launching the databricks->settings->developer->manage access token->generate access token
+//   }
+//   dependsOn: [
+//     databricks
+//   ]
+// }
+
+// //batch linked service module
+// module Batch_LinkedService 'LinkedService/AzureBatchLinkService/template.bicep' = {
+//   name: 'Batch_LinkedServiceModule'
+//   params: {
+//     envType: envType
+//     prefix: prefix
+//     stamp: stamp
+//     region: region
+//     // accessKey: kv.getSecret('batchpasskey')     //Primary access key from Keys in batch account
+//   }
+// }
+
+
+// //dataset module
+// module datasets 'Dataset/template.bicep' = {
+//   name: 'DatasetsModule'
+//   params: {
+//     envType: envType
+//     prefix: prefix
+//     stamp: stamp
+//   }
+//   dependsOn: [
+//     ADLS_LinkedService
+//     Batch_LinkedService
+//   ]
+// }
+
+//pipeline1 module
+module P1_LandingToRosbag 'ADF/Pipelines/Pipeline1_LandingToRosbag/template.bicep' = {
+  name: 'landingtorosbag'
   params: {
     envType: envType
     prefix: prefix
     stamp: stamp
   }
-  dependsOn: [
-    ADLS_LinkedService
-    Batch_LinkedService
-  ]
 }

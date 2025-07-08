@@ -9,6 +9,7 @@ resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {
   properties: {}
 }
 
+
 // Trigger 1: New_Measurements
 resource blobEventsTrigger1 'Microsoft.DataFactory/factories/triggers@2018-06-01' = {
   name: '${dataFactory.name}/New_Measuremets'
