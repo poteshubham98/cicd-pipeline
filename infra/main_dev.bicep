@@ -46,16 +46,16 @@ param region string
 //   }
 // }
 
-//databricks module
-module databricks 'Databricks/template.bicep' = {
-  name: 'DatabricksModule'
-  params: {
-    prefix:prefix
-    stamp:stamp
-    envType:envType
-    region: region
-  }
-}
+// //databricks module
+// module databricks 'Databricks/template.bicep' = {
+//   name: 'DatabricksModule'
+//   params: {
+//     prefix:prefix
+//     stamp:stamp
+//     envType:envType
+//     region: region
+//   }
+// }
 
 // // Enriched Storage Account
 // module enriched 'StorageAccount/enriched/template.bicep' = {
@@ -144,3 +144,75 @@ module databricks 'Databricks/template.bicep' = {
 //     stamp: stamp
 //   }
 // }
+//====================================================
+//databricks module
+module databricks 'Databricks/template.bicep' = {
+  name: 'DatabricksModule'
+  params: {
+    prefix:prefix
+    stamp:stamp
+    envType:envType
+    region: region
+  }
+}
+
+//datafactory module
+module datafactory 'ADF/ADFTemplate/adfcreation.bicep' = {
+  name: 'datafactoryModule'
+  params: {
+    prefix:prefix
+    stamp:stamp
+    envType:envType
+    region: region
+  }
+}
+
+//linked service module
+module ADLS_LinkedService 'ADF/ADFTemplate/linkedservice1.bicep' = {
+  name: 'ADLS-DB_Module'
+  params: {
+    prefix:prefix
+    stamp:stamp
+    envType:envType
+    // accessKey:kv.getSecret('databrickspasskey')         //access token after launching the databricks->settings->developer->manage access token->generate access token
+  }
+  dependsOn: [
+    databricks
+  ]
+}
+
+//batch linked service module
+module Batch_LinkedService 'ADF/ADFTemplate/linkedservice2.bicep' = {
+  name: 'Batch_LinkedServiceModule'
+  params: {
+    envType: envType
+    prefix: prefix
+    stamp: stamp
+    region: region
+    // accessKey: kv.getSecret('batchpasskey')     //Primary access key from Keys in batch account
+  }
+}
+
+//dataset module
+module datasets 'Dataset/template.bicep' = {
+  name: 'DatasetsModule'
+  params: {
+    envType: envType
+    prefix: prefix
+    stamp: stamp
+  }
+  dependsOn: [
+    ADLS_LinkedService
+    Batch_LinkedService
+  ]
+}
+
+//pipeline1 module
+module P1_LandingToRosbag 'ADF/Pipelines/Pipeline1_LandingToRosbag/template.bicep' = {
+  name: 'landingtorosbag'
+  params: {
+    envType: envType
+    prefix: prefix
+    stamp: stamp
+  }
+}
