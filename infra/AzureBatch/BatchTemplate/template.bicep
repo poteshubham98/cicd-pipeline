@@ -18,7 +18,7 @@ resource batchStorage 'Microsoft.Storage/storageAccounts@2023-04-01' = {
 
 // Deploy Batch Account using the above storage
 resource batch_account 'Microsoft.Batch/batchAccounts@2024-02-01' = {
-  name: 'tcsdataopsbatch${envType}${stamp}'
+  name: '${prefix}dataopsbatch${envType}${stamp}'
   location: region
   properties: {
     autoStorage: {
@@ -41,7 +41,7 @@ resource batch_account 'Microsoft.Batch/batchAccounts@2024-02-01' = {
 // Execution pool
 resource executionpool 'Microsoft.Batch/batchAccounts/pools@2024-02-01' = {
   parent: batch_account
-  name: 'tcsdataops-executionpool'
+  name: '${prefix}dataops-executionpool'
   properties: {
     vmSize: 'STANDARD_D8S_V3'
     interNodeCommunication: 'Disabled'
@@ -99,7 +99,7 @@ resource executionpool 'Microsoft.Batch/batchAccounts/pools@2024-02-01' = {
 // Orchestrator pool
 resource orchestratorpool 'Microsoft.Batch/batchAccounts/pools@2024-02-01' = {
   parent: batch_account
-  name: 'tcsdataops-orchestratorpool'
+  name: '${prefix}dataops-orchestratorpool'
   properties: {
     vmSize: 'STANDARD_D8S_V3'
     interNodeCommunication: 'Disabled'
