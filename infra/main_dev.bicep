@@ -80,16 +80,7 @@ module databricks 'Databricks/template.bicep' = {
 //   }
 // }
 
-//datafactory module
-module datafactory 'ADF/ADFTemplate/adfsetup.bicep' = {
-  name: 'datafactoryModule'
-  params: {
-    prefix:prefix
-    stamp:stamp
-    envType:envType
-    region: region
-  }
-}
+
 
 
 // //linked service module
@@ -133,12 +124,23 @@ module datafactory 'ADF/ADFTemplate/adfsetup.bicep' = {
 //   ]
 // }
 
-//pipeline1 module
-module P1_LandingToRosbag 'ADF/Pipelines/Pipeline1_LandingToRosbag/template.bicep' = {
-  name: 'landingtorosbag'
-  params: {
-    envType: envType
-    prefix: prefix
-    stamp: stamp
-  }
-}
+// //datafactory module
+// module datafactory 'ADF/ADFTemplate/adfsetup.bicep' = {
+//   name: 'datafactoryModule'
+//   params: {
+//     prefix:prefix
+//     stamp:stamp
+//     envType:envType
+//     region: region
+//   }
+// }
+
+// //pipeline1 module
+// module P1_LandingToRosbag 'ADF/Pipelines/Pipeline1_LandingToRosbag/template.bicep' = {
+//   name: 'landingtorosbag'
+//   params: {
+//     envType: envType
+//     prefix: prefix
+//     stamp: stamp
+//   }
+// }
