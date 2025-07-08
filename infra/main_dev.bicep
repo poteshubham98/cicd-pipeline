@@ -204,6 +204,9 @@ module Batch_LinkedService 'ADF/ADFTemplate/linkedservice2.bicep' = {
     region: region
     // accessKey: kv.getSecret('batchpasskey')     //Primary access key from Keys in batch account
   }
+  dependsOn: [
+    az_batch
+  ]
 }
 
 //dataset module
@@ -228,4 +231,7 @@ module P1_LandingToRosbag 'ADF/Pipelines/Pipeline1_LandingToRosbag/template.bice
     prefix: prefix
     stamp: stamp
   }
+  dependsOn: [
+    datasets
+  ]
 }
