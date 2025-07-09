@@ -1,4 +1,4 @@
-name: Deploy Raw+Derived Storage Account
+name: Deploy Pipeline 1
 
 on:
   workflow_dispatch:
