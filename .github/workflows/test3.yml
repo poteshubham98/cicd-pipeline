@@ -14,12 +14,12 @@ on:
       envType:
         description: 'Select an environment type'
         required: true
-        default: 'development'
+        default: 'd'
         type: choice
         options:
-          - development
-          - staging
-          - production
+          - d
+          - s
+          - p
       region:
         description: 'Select a region'
         required: true
