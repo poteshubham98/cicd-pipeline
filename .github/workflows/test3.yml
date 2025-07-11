@@ -2,6 +2,34 @@ name: Deploy Pipeline 1
 
 on:
   workflow_dispatch:
+    inputs:
+      prefix:
+        description: 'Enter the prefix'
+        required: true
+        type: string
+      stamp:
+        description: 'Enter a stamp'
+        required: true
+        type: string
+      envType:
+        description: 'Select an environment type'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      region:
+        description: 'Select a region'
+        required: true
+        default: 'japaneast'
+        type: choice
+        options:
+          - us-east-1
+          - us-west-1
+          - eu-central-1
+          - ap-south-1
 
 jobs:
   deploy-raw:
@@ -31,4 +59,4 @@ jobs:
           resource-group-name: github-cicd
           template-file: infra/main_dev.bicep
           parameters-file: infra/main_dev.bicepparam
-
+          
