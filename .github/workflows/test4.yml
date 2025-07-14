@@ -39,32 +39,34 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Generate parameters file without jq
+      - name: Install jq (only for Windows runners)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          choco install jq
+
+      - name: Merge runtime parameters with .bicepparam
         id: genparams
         shell: bash
         run: |
-          PARAM_FILE="infra/params.generated.json"
-          echo "{" > $PARAM_FILE
-          first=true
+          DEFAULT_FILE="infra/main_dev.bicepparam"
+          OUTPUT_FILE="infra/merged_params.json"
+
+          cp $DEFAULT_FILE $OUTPUT_FILE
 
           if [ -n "${{ github.event.inputs.prefix }}" ]; then
-            echo "  \"prefix\": { \"value\": \"${{ github.event.inputs.prefix }}\" }" >> $PARAM_FILE
-            first=false
+            jq --arg val "${{ github.event.inputs.prefix }}" '.parameters.prefix.value = $val' $OUTPUT_FILE > tmp && mv tmp $OUTPUT_FILE
           fi
 
           if [ -n "${{ github.event.inputs.stamp }}" ]; then
-            if [ "$first" = false ]; then echo "," >> $PARAM_FILE; fi
-            echo "  \"stamp\": { \"value\": \"${{ github.event.inputs.stamp }}\" }" >> $PARAM_FILE
-            first=false
+            jq --arg val "${{ github.event.inputs.stamp }}" '.parameters.stamp.value = $val' $OUTPUT_FILE > tmp && mv tmp $OUTPUT_FILE
           fi
 
           if [ -n "${{ github.event.inputs.envType }}" ]; then
-            if [ "$first" = false ]; then echo "," >> $PARAM_FILE; fi
-            echo "  \"envType\": { \"value\": \"${{ github.event.inputs.envType }}\" }" >> $PARAM_FILE
+            jq --arg val "${{ github.event.inputs.envType }}" '.parameters.envType.value = $val' $OUTPUT_FILE > tmp && mv tmp $OUTPUT_FILE
           fi
 
-          echo "}" >> $PARAM_FILE
-          echo "file=$PARAM_FILE" >> $GITHUB_OUTPUT
+          echo "file=$OUTPUT_FILE" >> $GITHUB_OUTPUT
 
       - name: Deploy Bicep Template (raw + derived +)
         uses: azure/bicep-deploy@v2
@@ -76,6 +78,4 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resource-group-name: github-cicd
           template-file: infra/main_dev.bicep
-          parameters: |
-            @infra/main_dev.bicepparam
-            @${{ steps.genparams.outputs.file }}
+          parameters-file: ${{ steps.genparams.outputs.file }}
