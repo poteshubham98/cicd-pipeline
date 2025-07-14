@@ -41,10 +41,11 @@ jobs:
 
       - name: Generate parameters file without jq
         id: genparams
+        shell: bash  # <-- this line is the fix
         run: |
           PARAM_FILE="infra/params.generated.json"
           echo "{" > $PARAM_FILE
-          
+
           first=true
 
           if [ -n "${{ github.event.inputs.prefix }}" ]; then
