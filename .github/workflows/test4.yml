@@ -41,11 +41,10 @@ jobs:
 
       - name: Generate parameters file without jq
         id: genparams
-        shell: bash  # <-- this line is the fix
+        shell: bash
         run: |
           PARAM_FILE="infra/params.generated.json"
           echo "{" > $PARAM_FILE
-
           first=true
 
           if [ -n "${{ github.event.inputs.prefix }}" ]; then
@@ -77,4 +76,6 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resource-group-name: github-cicd
           template-file: infra/main_dev.bicep
-          parameters-file: ${{ steps.genparams.outputs.file }}
+          parameters-files: |
+            infra/main_dev.bicepparam
+            ${{ steps.genparams.outputs.file }}
