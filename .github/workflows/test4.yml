@@ -1,0 +1,79 @@
+name: Deploy Pipeline 2
+
+on:
+  workflow_dispatch:
+    inputs:
+      prefix:
+        description: 'Enter the prefix'
+        required: false
+        type: string
+      stamp:
+        description: 'Enter a stamp'
+        required: false
+        type: string
+      envType:
+        description: 'Select an environment type'
+        required: false
+        default: 'd'
+        type: choice
+        options: [d, s, p]
+      region:
+        description: 'Select a region'
+        required: false
+        default: 'japaneast'
+        type: choice
+        options: [us-east-1, us-west-1, eu-central-1, ap-south-1, japaneast]
+
+jobs:
+  deploy-raw:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure login using managed identity
+        uses: azure/login@v2
+        with:
+          auth-type: IDENTITY
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Generate parameters file without jq
+        id: genparams
+        run: |
+          PARAM_FILE="infra/params.generated.json"
+          echo "{" > $PARAM_FILE
+          
+          first=true
+
+          if [ -n "${{ github.event.inputs.prefix }}" ]; then
+            echo "  \"prefix\": { \"value\": \"${{ github.event.inputs.prefix }}\" }" >> $PARAM_FILE
+            first=false
+          fi
+
+          if [ -n "${{ github.event.inputs.stamp }}" ]; then
+            if [ "$first" = false ]; then echo "," >> $PARAM_FILE; fi
+            echo "  \"stamp\": { \"value\": \"${{ github.event.inputs.stamp }}\" }" >> $PARAM_FILE
+            first=false
+          fi
+
+          if [ -n "${{ github.event.inputs.envType }}" ]; then
+            if [ "$first" = false ]; then echo "," >> $PARAM_FILE; fi
+            echo "  \"envType\": { \"value\": \"${{ github.event.inputs.envType }}\" }" >> $PARAM_FILE
+          fi
+
+          echo "}" >> $PARAM_FILE
+          echo "file=$PARAM_FILE" >> $GITHUB_OUTPUT
+
+      - name: Deploy Bicep Template (raw + derived +)
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: create
+          name: RawDerivedDeployment
+          scope: resourceGroup
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: github-cicd
+          template-file: infra/main_dev.bicep
+          parameters-file: ${{ steps.genparams.outputs.file }}
