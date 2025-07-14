@@ -76,6 +76,6 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resource-group-name: github-cicd
           template-file: infra/main_dev.bicep
-          parameters-files: |
-            infra/main_dev.bicepparam
-            ${{ steps.genparams.outputs.file }}
+          parameters: |
+            @infra/main_dev.bicepparam
+            @${{ steps.genparams.outputs.file }}
