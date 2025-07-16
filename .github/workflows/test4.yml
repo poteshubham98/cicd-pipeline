@@ -1,28 +1,35 @@
-name: Deploy Pipeline 2
+name: Deploy Pipeline 1
 
 on:
   workflow_dispatch:
     inputs:
       prefix:
         description: 'Enter the prefix'
-        required: false
+        required: true
         type: string
       stamp:
         description: 'Enter a stamp'
-        required: false
+        required: true
         type: string
       envType:
         description: 'Select an environment type'
-        required: false
+        required: true
         default: 'd'
         type: choice
-        options: [d, s, p]
+        options:
+          - d
+          - s
+          - p
       region:
         description: 'Select a region'
-        required: false
+        required: true
         default: 'japaneast'
         type: choice
-        options: [us-east-1, us-west-1, eu-central-1, ap-south-1, japaneast]
+        options:
+          - us-east-1
+          - us-west-1
+          - eu-central-1
+          - ap-south-1
 
 jobs:
   deploy-raw:
@@ -39,35 +46,20 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Install jq (only for Windows runners)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          choco install jq
+      
 
-      - name: Merge runtime parameters with .bicepparam
-        id: genparams
-        shell: bash
-        run: |
-          DEFAULT_FILE="infra/main_dev.bicepparam"
-          OUTPUT_FILE="infra/merged_params.json"
-
-          cp $DEFAULT_FILE $OUTPUT_FILE
-
-          if [ -n "${{ github.event.inputs.prefix }}" ]; then
-            jq --arg val "${{ github.event.inputs.prefix }}" '.parameters.prefix.value = $val' $OUTPUT_FILE > tmp && mv tmp $OUTPUT_FILE
-          fi
-
-          if [ -n "${{ github.event.inputs.stamp }}" ]; then
-            jq --arg val "${{ github.event.inputs.stamp }}" '.parameters.stamp.value = $val' $OUTPUT_FILE > tmp && mv tmp $OUTPUT_FILE
-          fi
-
-          if [ -n "${{ github.event.inputs.envType }}" ]; then
-            jq --arg val "${{ github.event.inputs.envType }}" '.parameters.envType.value = $val' $OUTPUT_FILE > tmp && mv tmp $OUTPUT_FILE
-          fi
-
-          echo "file=$OUTPUT_FILE" >> $GITHUB_OUTPUT
-
+      # - name: Deploy Bicep Template (raw + derived +)
+      #   uses: azure/bicep-deploy@v2
+      #   with:
+      #     type: deployment
+      #     operation: create
+      #     name: RawDerivedDeployment
+      #     scope: resourceGroup
+      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      #     resource-group-name: github-cicd
+      #     template-file: infra/main_dev.bicep
+      #     parameters-file: infra/main_dev.bicepparam
+          
       - name: Deploy Bicep Template (raw + derived +)
         uses: azure/bicep-deploy@v2
         with:
@@ -78,4 +70,8 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resource-group-name: github-cicd
           template-file: infra/main_dev.bicep
-          parameters-file: ${{ steps.genparams.outputs.file }}
+          parameters: |
+            prefix=${{ github.event.inputs.prefix }}
+            stamp=${{ github.event.inputs.stamp }}
+            envType=${{ github.event.inputs.envType }}
+            region=${{ github.event.inputs.region }}
