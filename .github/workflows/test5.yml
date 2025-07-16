@@ -1,0 +1,78 @@
+#input with if conditions
+name: Deploy Pipeline 1
+
+on:
+  workflow_dispatch:
+    inputs:
+      prefix:
+        description: 'Enter the prefix'
+        required: false
+        type: string
+      stamp:
+        description: 'Enter a stamp'
+        required: false
+        type: string
+      envType:
+        description: 'Select an environment type'
+        required: false
+        type: choice
+        options: [d, s, p]
+        default: d
+      region:
+        description: 'Select a region'
+        required: false
+        type: choice
+        options:
+          - centralindia
+          - eastus
+          - westus
+          - southindia
+          - japaneast
+        default: centralindia
+
+jobs:
+  deploy-raw:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure login using managed identity
+        uses: azure/login@v2
+        with:
+          auth-type: IDENTITY
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # 👉 If 'prefix' is provided, use inline parameters
+      - name: Deploy using input parameters
+        if: ${{ github.event.inputs.prefix != '' }}
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: create
+          name: RawDerivedDeployment
+          scope: resourceGroup
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: github-cicd
+          template-file: infra/main_dev.bicep
+          parameters: |
+            prefix: "${{ github.event.inputs.prefix }}"
+            stamp: "${{ github.event.inputs.stamp }}"
+            envType: "${{ github.event.inputs.envType }}"
+            region: "${{ github.event.inputs.region }}"
+
+      # 👉 If 'prefix' is not provided, fallback to parameter file
+      - name: Deploy using parameter file
+        if: ${{ github.event.inputs.prefix == '' }}
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: create
+          name: RawDerivedDeployment
+          scope: resourceGroup
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: github-cicd
+          template-file: infra/main_dev.bicep
+          parameters-file: infra/main_dev.bicepparam
