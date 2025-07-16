@@ -23,11 +23,11 @@ on:
       region:
         description: 'Select a region'
         required: true
-        default: 'japaneast'
+        default: 'centralindia'
         type: choice
         options:
-          - us-east-1
-          - us-west-1
+          - eastus
+          - centralindia
           - eu-central-1
           - ap-south-1
 
