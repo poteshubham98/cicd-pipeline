@@ -71,7 +71,7 @@ jobs:
           resource-group-name: github-cicd
           template-file: infra/main_dev.bicep
           parameters: |
-            prefix=${{ github.event.inputs.prefix }}
-            stamp=${{ github.event.inputs.stamp }}
-            envType=${{ github.event.inputs.envType }}
-            region=${{ github.event.inputs.region }}
+            prefix: ${{ github.event.inputs.prefix }}
+            stamp: ${{ github.event.inputs.stamp }}
+            envType: ${{ github.event.inputs.envType }}
+            region: ${{ github.event.inputs.region }}
