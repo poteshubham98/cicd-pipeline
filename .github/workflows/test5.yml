@@ -45,7 +45,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # 👉 If 'prefix' is provided, use inline parameters
+    
       - name: Deploy using input parameters
         if: ${{ github.event.inputs.prefix != '' }}
         uses: azure/bicep-deploy@v2
@@ -63,7 +63,7 @@ jobs:
             envType: "${{ github.event.inputs.envType }}"
             region: "${{ github.event.inputs.region }}"
 
-      # 👉 If 'prefix' is not provided, fallback to parameter file
+      
       - name: Deploy using parameter file
         if: ${{ github.event.inputs.prefix == '' }}
         uses: azure/bicep-deploy@v2
